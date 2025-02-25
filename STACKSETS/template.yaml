@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "StackSet de ejemplo para crear una instancia EC2 con un Security Group"
+
+Parameters:
+  InstanceType:
+    Description: "Tipo de instancia EC2"
+    Type: String
+    Default: "t2.micro"
+    AllowedValues: ["t2.micro", "t2.small", "t2.medium"]
+
+  KeyName:
+    Description: "Nombre de la clave SSH (debe existir en la cuenta)"
+    Type: AWS::EC2::KeyPair::KeyName
+
+  VpcId:
+    Description: "VPC donde se desplegará la instancia"
+    Type: AWS::EC2::VPC::Id
+
+  SubnetId:
+    Description: "Subnet donde se desplegará la instancia"
+    Type: AWS::EC2::Subnet::Id
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: "ami-0c55b159cbfafe1f0"
+    us-west-2:
+      AMI: "ami-0abcdef1234567890"
+    eu-west-1:
+      AMI: "ami-0fedcba9876543210"
+
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Permitir tráfico HTTP"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          GroupSet:
+            - !Ref SecurityGroup
+
+Outputs:
+  InstanceId:
+    Description: "ID de la instancia EC2 creada"
+    Value: !Ref EC2Instance

@@ -1,0 +1,15 @@
+Transform: AutoTaggingMacro 
+
+Resources:
+  MyBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: "monea-rapida-prod"
+      Tags: []  
+
+  MyInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      InstanceType: "t2.micro"
+      ImageId: "ami-12345678"
+      Tags: [] 

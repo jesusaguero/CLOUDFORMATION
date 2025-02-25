@@ -1,0 +1,6 @@
+Resources:
+  AutoTaggingMacro:
+    Type: AWS::CloudFormation::Macro
+    Properties:
+      Name: "AutoTaggingMacro"  # Nombre de la Macro
+      FunctionName: "AutoTagLambda"  # Nombre de la función Lambda en AWS

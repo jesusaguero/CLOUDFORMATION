@@ -1,0 +1,111 @@
+### CREACIÓN DE UNA FUNCION LAMBDA
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9
+      CodeUri: ./src
+      Policies:
+        - AWSLambdaBasicExecutionRole
+
+### API REST CON API GATEWAY - LAMBDA
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: ./src
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+            RestApiId: !Ref MyApi
+
+### LAMBDA - S3 EVENT
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9
+      CodeUri: ./src
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref MyBucket
+            Events: s3:ObjectCreated:*
+
+### READ - WRITE  -DYNAMODB
+
+Resources:
+  MyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: MyData
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.handler
+      Runtime: nodejs18.x
+      CodeUri: ./src
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyTable
+
+### CLODUWATCH - LAMBDA
+
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: python3.9
+      CodeUri: ./src
+      Events:
+        ScheduleEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+
+### SNS - LAMBDA
+
+Resources:
+  MyTopic:
+    Type: AWS::SNS::Topic
+
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      CodeUri: ./src
+      Events:
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref MyTopic

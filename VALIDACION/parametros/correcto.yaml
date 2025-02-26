@@ -1,0 +1,16 @@
+Parameters:
+  InstanceType:
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+  ImageId:
+    Type: AWS::EC2::Image::Id 
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageId

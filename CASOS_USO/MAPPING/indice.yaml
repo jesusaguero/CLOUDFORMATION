@@ -1,0 +1,92 @@
+### AMI SEGUN LA REGIÓN
+
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: "ami-12345678"
+    us-west-2:
+      AMI: "ami-87654321"
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !FindInMap [RegionMap, !Ref "AWS::Region", AMI]
+
+### CONFIGURACIONES X ENTRONO
+
+Mappings:
+  EnvConfig:
+    Dev:
+      InstanceType: t2.micro
+    Prod:
+      InstanceType: m5.large
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: ["Dev", "Prod"]
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [EnvConfig, !Ref Environment, InstanceType]
+
+### PERSONALIZACIÓN X TIPO DE SO // COMANDOS DE ARRANQUE
+
+Mappings:
+  OSConfig:
+    Linux:
+      UserData: "#!/bin/bash\necho 'Linux instance'"
+    Windows:
+      UserData: "powershell Write-Output 'Windows instance'"
+
+Parameters:
+  OperatingSystem:
+    Type: String
+    AllowedValues: ["Linux", "Windows"]
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      UserData: !Base64 !FindInMap [OSConfig, !Ref OperatingSystem, UserData]
+
+### CONFIGURACION DE NOMBRES DE DOMINIOS PERSONALIZADOS
+
+Mappings:
+  DomainMap:
+    us-east-1:
+      Domain: "us-east.example.com"
+    eu-west-1:
+      Domain: "eu-west.example.com"
+
+Resources:
+  MyRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneName: example.com.
+      Name: !FindInMap [DomainMap, !Ref "AWS::Region", Domain]
+      Type: A
+      TTL: 300
+      ResourceRecords:
+        - "192.168.1.1"
+
+### CONFIGURACION DEL TAMAÑO DE LOS VOLUMENES SEGUN LA REGION
+Mappings:
+  StorageConfig:
+    us-east-1:
+      Size: 50
+    eu-west-1:
+      Size: 100
+
+Resources:
+  MyVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      AvailabilityZone: !Select [0, !GetAZs !Ref "AWS::Region"]
+      Size: !FindInMap [StorageConfig, !Ref "AWS::Region", Size]  # ✅ Tamaño según región
+      VolumeType: gp3

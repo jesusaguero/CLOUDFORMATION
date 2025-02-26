@@ -1,0 +1,13 @@
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: "ami-123456"
+    eu-west-1:
+      AMI: "ami-987654"
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: !FindInMap [RegionMap, us-west-2, AMI] 

@@ -1,0 +1,5 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: MultiResourcesMacro  # Creará dos buckets: mybucket-dev y mybucket-prod
+
+Resources:
+  TemplateBucket: {}  # La macro lo expandirá en MyBucketDev y MyBucketProd

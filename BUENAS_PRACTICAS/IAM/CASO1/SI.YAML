@@ -1,0 +1,37 @@
+Resources:
+  MyInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3ReadAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - s3:GetObject
+                Resource: "arn:aws:s3:::my-bucket/*"
+
+  MyInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref MyInstanceRole
+
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-123456
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref MyInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          aws s3 cp s3://my-bucket/myfile.txt /home/ec2-user/

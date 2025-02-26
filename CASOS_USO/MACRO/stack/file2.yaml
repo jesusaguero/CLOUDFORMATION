@@ -1,0 +1,7 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AutoNamingMacro  # La macro generará nombres automáticamente
+
+Resources:
+  MyBucket:
+    Type: AWS::S3::Bucket
+    Properties: {} 

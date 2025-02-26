@@ -1,0 +1,13 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: ValidateParamsMacro  # Validará que InstanceType sea permitido
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.nano  # ⚠️ ERROR: No está permitido (t2.micro y t3.medium sí)
+
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType

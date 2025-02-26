@@ -5,7 +5,7 @@ Parameters:
   KeyPairName:
     Type: String
     Description: "Nombre de la clave SSH"
-\
+    
 Resources:
   MyEC2Instance:
     Type: AWS::EC2::Instance

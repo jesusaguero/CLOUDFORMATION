@@ -5,7 +5,7 @@ Resources:
   MyS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-secure-bucket-12345  # Cambia esto por un nombre único
+      BucketName: my-secure-bucket-12345
       AccessControl: Private
       VersioningConfiguration:
         Status: Enabled

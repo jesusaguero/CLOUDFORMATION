@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Ejemplo de uso de Pseudo Parameters en CloudFormation
+
+Resources:
+  MiSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Permitir tráfico SSH"
+      VpcId: !Ref MiVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  MiInstanciaEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0c55b159cbfafe1f0 # AMI válida en us-east-1
+      SecurityGroupIds:
+        - !Ref MiSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "EC2-${AWS::StackName}-${AWS::Region}"
+
+  MiS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "bucket-${AWS::AccountId}-${AWS::Region}"
+
+Outputs:
+  StackName:
+    Description: "Nombre del Stack"
+    Value: !Ref AWS::StackName
+
+  BucketName:
+    Description: "Nombre del S3 Bucket creado"
+    Value: !Ref MiS3Bucket

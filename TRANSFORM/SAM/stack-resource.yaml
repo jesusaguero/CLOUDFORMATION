@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Despliegue de una aplicación Serverless con API Gateway y Lambda"
+
+Resources:
+  # Lambda Function
+  MyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: "MySAMLambda"
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      CodeUri: ./src
+      Description: "Lambda que responde a solicitudes HTTP"
+      MemorySize: 128
+      Timeout: 5
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: GET
+
+Outputs:
+  ApiGatewayEndpoint:
+    Description: "URL del API Gateway"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+
+  LambdaFunctionARN:
+    Description: "ARN de la Lambda"
+    Value: !GetAtt MyLambdaFunction.Arn

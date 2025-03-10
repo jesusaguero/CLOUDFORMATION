@@ -4,7 +4,7 @@ Resources:
   MyBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: "monea-rapida-prod"
+      BucketName: "moneda-rapida-prod"
       Tags: []  
 
   MyInstance:

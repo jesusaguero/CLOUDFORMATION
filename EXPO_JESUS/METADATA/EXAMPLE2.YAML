@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Configuracion de Red"
+        Parameters:
+          - VpcId
+          - SubnetId
+      - Label:
+          default: "Configuracion del Servidor"
+        Parameters:
+          - InstanceType
+          - KeyName
+    ParameterLabels:
+      VpcId:
+        default: "Seleccione una VPC"
+      SubnetId:
+        default: "Seleccione una Subnet"
+      InstanceType:
+        default: "Tipo de Instancia EC2"
+      KeyName:
+        default: "Clave SSH para Acceso"
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: "ID de la VPC donde se desplegará la instancia"
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: "ID de la Subnet donde se ubicará la instancia"
+  InstanceType:
+    Type: String
+    Default: "t2.micro"
+    AllowedValues: ["t2.micro", "t2.small", "t2.medium"]
+    Description: "Elige el tipo de instancia EC2"
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "Nombre del par de claves SSH"
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      SubnetId: !Ref SubnetId
+      ImageId: "ami-0c55b159cbfafe1f0" 
+
+Outputs:
+  InstanceId:
+    Description: "ID de la instancia EC2 creada"
+    Value: !Ref MyEC2Instance

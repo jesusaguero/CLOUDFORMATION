@@ -1,0 +1,6 @@
+Resources:
+  MyAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Metadata:
+      Version: "1.0"
+      Purpose: "Escalar automáticamente servidores web"

@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+
+  MySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: "10.0.1.0/24"
+
+Metadata:
+  AWS::CloudFormation::Designer:
+    MyVPC:
+      id: "vpc-unique-id"
+      position:
+        x: 100
+        y: 50
+    MySubnet:
+      id: "subnet-unique-id"
+      position:
+        x: 200
+        y: 100
+      dependson:
+        - MyVPC

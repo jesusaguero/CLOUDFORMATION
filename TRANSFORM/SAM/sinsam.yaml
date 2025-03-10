@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "Lambda con API Gateway sin SAM"
+
+Resources:
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: "MyLambda"
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Code:
+        S3Bucket: my-bucket
+        S3Key: lambda-code.zip
+      Role: !GetAtt MyLambdaExecutionRole.Arn
+      MemorySize: 128
+      Timeout: 5
+
+  MyApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "MyAPI"
+  
+  MyApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref MyApiGateway
+      ParentId: !GetAtt MyApiGateway.RootResourceId
+      PathPart: "hello"
+
+  MyApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref MyApiGateway
+      ResourceId: !Ref MyApiResource
+      HttpMethod: GET
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaArn}/invocations"
+          - { LambdaArn: !GetAtt MyLambdaFunction.Arn }
+
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: MyApiMethod
+    Properties:
+      RestApiId: !Ref MyApiGateway
+      StageName: Prod
+
+Outputs:
+  ApiGatewayInvokeURL:
+    Description: "API Gateway endpoint"
+    Value: !Sub "https://${MyApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
